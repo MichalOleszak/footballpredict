@@ -2,9 +2,14 @@
 library(dplyr)
 library(caret)
 library(caretEnsemble)
+library(RCurl)
+library(tidyr)
 for (file in list.files("R")) {
   source(file.path("R", file))
 }
+
+# Settings --------------------------------------------------------------------
+scrape_new_data <- TRUE
 
 # Modelling framework ---------------------------------------------------------
 main <- function() {

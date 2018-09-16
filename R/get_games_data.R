@@ -9,8 +9,11 @@ get_games_data <- function(seasons) {
     as_tibble() %>% 
     filter(Date != "") %>% 
     select(Date, HomeTeam, AwayTeam, FTHG, FTAG, FTR, B365H, B365D, B365A) %>% 
-    mutate(Date = as.Date(Date, format = "%d/%m/%Y")) %>% 
+    mutate(Date = ifelse(nchar(Date) == 8, Date, str_replace(Date, "/20", "/")),
+           Date = as.Date(Date, format = "%d/%m/%y")) %>% 
     rename(date = Date, home_team = HomeTeam, away_team = AwayTeam,
-           home_goals = FTHG, away_goals = FTAG, result = FTR)
+           home_goals = FTHG, away_goals = FTAG, result = FTR) %>% 
+    mutate(home_team = ifelse(home_team == "Middlesboro", "Middlesbrough", home_team),
+           away_team = ifelse(away_team == "Middlesboro", "Middlesbrough", away_team))
   return(results)
 }
