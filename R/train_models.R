@@ -1,10 +1,11 @@
 train_models <- function(games_train, models_to_train) {
-  
+
   # Set training control
   train_control <- trainControl(method = "repeatedcv", 
                                 number = 5, 
                                 repeats = 5,
                                 savePredictions = "final", 
+                                search = "random",
                                 classProbs = TRUE,
                                 summaryFunction = multiClassSummary,
                                 allowParallel = TRUE, 
@@ -16,12 +17,8 @@ train_models <- function(games_train, models_to_train) {
                       trControl = train_control,
                       metric = "Mean_Pos_Pred_Value",
                       preProcess = c("center", "scale"),
+                      tuneLength = 5,
                       methodList = models_to_train,
-                     #tuneList = list(
-                     #       nnet = caretModelSpec(method = "nnet", 
-                     #                             trace = FALSE, 
-                     #                             tuneLength = 1)
-                     #    ),
                       continue_on_fail = TRUE)
   
   # Box plots to compare models

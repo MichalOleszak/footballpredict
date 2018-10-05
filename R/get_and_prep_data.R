@@ -16,14 +16,17 @@ get_and_prep_data <- function(seasons) {
     rename(home_elo = elo) %>% 
     left_join(elo_data, by = c("date" = "date", "away_team" = "club")) %>% 
     rename(away_elo = elo) %>% 
-    select(-date, -home_team, -away_team)
+    select(-date, -home_team, -away_team, -B365H, -B365D, -B365A)
+  
+  # Impute or drop missings
+  games_train <- games_train[complete.cases(games_train), ]
   
   # Save to disc
   if (!dir.exists("data")) {
     dir.create("data")
   }
-  save(games_train, file = "data/games_train.RData")
-  save(elo_recent, file = "data/elo_recent.RData")
+  saveRDS(games_train, file = "data/games_train.rds")
+  saveRDS(elo_recent, file = "data/elo_recent.rds")
   
   return(games_train)
 }

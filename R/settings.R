@@ -11,4 +11,4 @@ elo_teams <- c("chelsea", "mancity", "manunited", "liverpool", "tottenham",
                "wigan", "birmingham", "blackburn", "bolton", "reading", "rotherham",
                "brighton", "fulham", "westbrom", "sheffieldunited")
 
-models_to_train <- c("rpart", "LogitBoost")#, "xgbTree")
+models_to_train <- c("LogitBoost", "rpart")#, "xgbTree")

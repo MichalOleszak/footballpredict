@@ -1,5 +1,6 @@
 get_elo_data <- function(date_start) {
-  elo_data <- lapply(elo_teams, function(team) {
+  print("Getting and prepping ELO data")
+  elo_data <- pblapply(elo_teams, function(team) {
     download <- paste0("api.clubelo.com/", team) %>% getURL()
     elo_data <- read.csv(text = download) %>% 
       bind_rows() %>% 

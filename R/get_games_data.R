@@ -1,9 +1,13 @@
 get_games_data <- function(seasons) {
   results <- list()
+  print("Getting and prepping historic data")
+  pb <- txtProgressBar(min = 0, max = length(seasons), style = 3, char = "~")
   for (season in seq(seasons)) {
     url <- paste0("http://www.football-data.co.uk/mmz4281/", seasons[[season]], "/E0.csv")
     results[[season]] <- read.csv(url)
+    setTxtProgressBar(pb, season)
   }
+  close(pb)
   results <- results %>% 
     bind_rows() %>% 
     as_tibble() %>% 
