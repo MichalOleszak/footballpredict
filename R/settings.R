@@ -12,3 +12,10 @@ elo_teams <- c("chelsea", "mancity", "manunited", "liverpool", "tottenham",
                "brighton", "fulham", "westbrom", "sheffieldunited")
 
 models_to_train <- c("LogitBoost", "rpart")#, "xgbTree")
+
+keras_cv_k <- 3
+keras_num_epochs <- 5
+
+path_models <- "models"
+path_data <- "data"
+path_results <- "predictions"

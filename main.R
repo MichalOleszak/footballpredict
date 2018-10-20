@@ -7,51 +7,59 @@ library(tidyr)
 library(lubridate)
 library(stringr)
 library(pbapply)
+library(readr)
+library(keras)
 pboptions(type = "txt", style = 3, char = "~", txt.width = NA)
 for (file in list.files("R")) {
   source(file.path("R", file))
 }
 
 # Settings --------------------------------------------------------------------
-scrape_new_data <- TRUE
+scrape_new_data <- FALSE
 train_new_models <- TRUE
 
 # Modelling framework ---------------------------------------------------------
 main <- function() {
-  # Set output file name
+  # Create paths and set output file name
   if (!dir.exists("predictions")) {
-    dir.create("predictions")
+    for (path in c(path_data, path_models, path_results)) {
+      dir.create(path)
+    }
   }
   timestamp <- now() %>% 
     str_sub(1, 20) %>% 
     str_replace_all(" ", "_") %>% 
     str_replace_all(":", "-")
-  output_path <- paste0("predictions/preds_", timestamp, ".xlsx")
+  output_path <- file.path(path_results, paste0("preds_", timestamp, ".xlsx"))
   # Get and prep data
   if (scrape_new_data) {
     games_train <- get_and_prep_data(seasons = historic_seasons)
   } else {
-    games_train <- readRDS("data/games_train.rds")
+    games_train <- readRDS(file.path(path_data, "games_train.rds"))
   }
   # Train models
   if (train_new_models) {
-    models_trained <- train_models(games_train, models_to_train)
-    # Fit models to traning data and buiid a regression-based ensembles
-    # for home wins and away wins
-    models_fitted <- fit_models(models_trained)
-    models_ensemble <- ensemble_models(models_fitted, models_trained)
-    saveRDS(models_ensemble, "data/models_ensemble.rds")
+    # Train base learners
+    base_learners <- train_models(games_train, models_to_train)
+    # Fit models to traning data and buiid a deep ensemble
+    models_fitted <- fit_models(base_learners)
+    ensemble_models(models_fitted, base_learners, games_train)
+    # Save base learneres and ensemble
+    saveRDS(base_learners, file.path(path_models, "base_learners.rds"))
   } else {
-    models_ensemble <- readRDS("data/models_ensemble.rds")
+    base_learners <- readRDS(file.path(path_models, "base_learners.rds"))
+    # TODO read serialized h5 model
   }
   # Get & predict testing data
   games_test <- get_upcoming_fixtures()
-  preds <- models_ensemble[[1]] %>% 
+  # TODO predict with each learner
+  # TODO predict with deep ensemble
+  preds <- deep_ensemble[[1]] %>% 
     predict(games_test, type = "prob")  %>%
     round(3) %>% 
     bind_cols(games_test) %>% 
     select(date, home_team, away_team, H, D, A) %>% 
-    write.xlsx(output_path, row.names = FALSE)
+    write.csv(output_path)
 }
 
 
