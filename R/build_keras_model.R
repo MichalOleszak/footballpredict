@@ -12,5 +12,6 @@ build_keras_model <- function(input_shape) {
     metrics = "accuracy"
   )
   # TODO add regularization, dropout, experiment with layers
+  # TODO add early stopping and these kinds of things
   return(model)
 }

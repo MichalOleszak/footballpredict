@@ -17,7 +17,7 @@ train_models <- function(games_train, models_to_train) {
                       trControl = train_control,
                       metric = "Mean_Pos_Pred_Value",
                       preProcess = c("center", "scale"),
-                      tuneLength = 5,
+                      tuneLength = 15,
                       methodList = models_to_train,
                       continue_on_fail = TRUE)
   
