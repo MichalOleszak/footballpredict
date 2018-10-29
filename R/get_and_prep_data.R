@@ -2,13 +2,16 @@ get_and_prep_data <- function(seasons) {
   
   # Get historic matches data
   historic_games <- get_games_data(seasons = historic_seasons)
-  
+
   # Get ELO data
   elo_data <- get_elo_data(date_start = min(historic_games$date))
   elo_recent <- elo_data %>% 
     group_by(club) %>% 
     filter(date == max(date))
-  
+
+  # Get recent form data
+  recent_form <- get_recent_form(recent_games = historic_games)
+
   # Clean final output data
   games_train <- historic_games %>% 
     select(date, home_team, away_team, result, B365H, B365D, B365A) %>% 
@@ -16,6 +19,12 @@ get_and_prep_data <- function(seasons) {
     rename(home_elo = elo) %>% 
     left_join(elo_data, by = c("date" = "date", "away_team" = "club")) %>% 
     rename(away_elo = elo) %>% 
+    left_join(recent_form %>% 
+                set_names(paste0("home_", colnames(recent_form))), 
+              by = c("home_team")) %>% 
+    left_join(recent_form %>% 
+                set_names(paste0("away_", colnames(recent_form))), 
+              by = c("away_team")) %>% 
     select(-date, -home_team, -away_team, -B365H, -B365D, -B365A)
   
   # Impute or drop missings

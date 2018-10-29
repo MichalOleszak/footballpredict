@@ -9,13 +9,12 @@ library(stringr)
 library(pbapply)
 library(readr)
 library(keras)
-pboptions(type = "txt", style = 3, char = "~", txt.width = NA)
 for (file in list.files("R")) {
   source(file.path("R", file))
 }
 
 # Settings --------------------------------------------------------------------
-scrape_new_data <- FALSE
+scrape_new_data <- TRUE
 train_new_models <- TRUE
 
 # Modelling framework ---------------------------------------------------------
