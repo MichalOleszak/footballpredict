@@ -21,11 +21,9 @@ ensemble_models <- function(models_fitted, models_trained, games_train) {
   keras_ensemble_model <- build_keras_model(input_shape = ncol(X))
   keras_ensemble_model %>% fit(X, 
                                one_hot_y,
-                               epochs = 80,
+                               epochs = 40,
                                batch_size = 16)
   
   # Serialize and save model
-  keras_ensemble_model <<- keras_ensemble_model
-  model_keras_serialized <- keras_ensemble_model %>% serialize_model(file.path(path_models, "keras_ensemble_model.h5"))
-  save(model_keras_serialized, file = "model_keras_serialized.RData")
+  save_model_hdf5(keras_ensemble_model, file.path(path_models, "keras_ensemble_model.h5"))
 }

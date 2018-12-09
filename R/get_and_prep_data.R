@@ -10,7 +10,13 @@ get_and_prep_data <- function(seasons) {
     filter(date == max(date))
 
   # Get recent form data
-  recent_form <- get_recent_form(recent_games = historic_games)
+  print("Calculating recent form for historic data")
+  historic_recent_form <- pblapply(unique(historic_games$date), function(hist_date) {
+    historic_recent_games <- historic_games %>% filter(date < hist_date)
+    out <- get_recent_form(recent_games = historic_recent_games) %>% 
+      mutate(search_date = hist_date)
+    return(out)
+  }) %>% bind_rows()
 
   # Clean final output data
   games_train <- historic_games %>% 
@@ -19,16 +25,14 @@ get_and_prep_data <- function(seasons) {
     rename(home_elo = elo) %>% 
     left_join(elo_data, by = c("date" = "date", "away_team" = "club")) %>% 
     rename(away_elo = elo) %>% 
-    left_join(recent_form %>% 
-                set_names(paste0("home_", colnames(recent_form))), 
-              by = c("home_team")) %>% 
-    left_join(recent_form %>% 
-                set_names(paste0("away_", colnames(recent_form))), 
-              by = c("away_team")) %>% 
-    select(-date, -home_team, -away_team, -B365H, -B365D, -B365A)
-  
-  # Impute or drop missings
-  games_train <- games_train[complete.cases(games_train), ]
+    left_join(historic_recent_form %>% 
+                set_names(paste0("home_", colnames(historic_recent_form))), 
+              by = c("home_team", "date" = "home_search_date")) %>% 
+    left_join(historic_recent_form %>% 
+                set_names(paste0("away_", colnames(historic_recent_form))), 
+              by = c("away_team", "date" = "away_search_date")) %>% 
+    select(-date, -home_team, -away_team, -B365H, -B365D, -B365A) %>% 
+    filter(complete.cases(.))
   
   # Save to disc
   if (!dir.exists("data")) {
@@ -36,6 +40,7 @@ get_and_prep_data <- function(seasons) {
   }
   saveRDS(games_train, file = "data/games_train.rds")
   saveRDS(elo_recent, file = "data/elo_recent.rds")
+  saveRDS(historic_games, file = "data/historic_games.rds")
   
   return(games_train)
 }

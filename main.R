@@ -9,6 +9,7 @@ library(stringr)
 library(pbapply)
 library(readr)
 library(keras)
+library(purrr)
 for (file in list.files("R")) {
   source(file.path("R", file))
 }
@@ -47,18 +48,21 @@ main <- function() {
     saveRDS(base_learners, file.path(path_models, "base_learners.rds"))
   } else {
     base_learners <- readRDS(file.path(path_models, "base_learners.rds"))
-    # TODO read serialized h5 model
   }
   # Get & predict testing data
-  games_test <- get_upcoming_fixtures()
-  # TODO predict with each learner
-  # TODO predict with deep ensemble
-  preds <- deep_ensemble[[1]] %>% 
-    predict(games_test, type = "prob")  %>%
-    round(3) %>% 
-    bind_cols(games_test) %>% 
-    select(date, home_team, away_team, H, D, A) %>% 
-    write.csv(output_path)
+  games_upcoming <- get_upcoming_fixtures()
+  # Predict with each learner
+  base_preds <- lapply(seq(base_learners), function(model_ind) {
+    base_learners[[model_ind]] %>% 
+      predict(games_upcoming, type = "prob")  %>%
+      select(A, D, H) %>% 
+      mutate(model = names(base_learners[model_ind]))
+  }) %>% bind_rows()
+  # TODO Predict with deep ensemble  
+  ensemble_preds <- keras_ensemble_predict(games_upcoming, base_preds)
+  
+  # TODO save pres in a csv at output_path
+  
 }
 
 
