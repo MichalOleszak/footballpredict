@@ -11,16 +11,21 @@ library(readr)
 library(keras)
 library(purrr)
 library(fst)
+library(ggplot2)
+library(scales)
+library(viridis)
 for (file in list.files("R")) {
   source(file.path("R", file))
 }
 
 # Settings --------------------------------------------------------------------
+predit_future_games <- TRUE
 scrape_new_data <- FALSE
 train_new_models <- FALSE
 
 # Modelling framework ---------------------------------------------------------
 main <- function() {
+  
   # Create paths and set output file name
   if (!dir.exists("predictions")) {
     for (path in c(path_data, path_models, path_results)) {
@@ -32,12 +37,14 @@ main <- function() {
     str_replace_all(" ", "_") %>% 
     str_replace_all(":", "-")
   path_output <- file.path(path_results, paste0("preds_", timestamp, ".fst"))
+  
   # Get and prep data
   if (scrape_new_data) {
     games_train <- get_and_prep_data(seasons = historic_seasons)
   } else {
     games_train <- readRDS(file.path(path_data, "games_train.rds"))
   }
+  
   # Train models
   if (train_new_models) {
     # Train & save base learners
@@ -46,9 +53,17 @@ main <- function() {
     # Fit models to traning data and buiid a deep ensemble & save
     models_fitted <- fit_models(base_learners)
     stand_stats <- ensemble_models(models_fitted, base_learners, games_train)
+    saveRDS(stand_stats, file.path(path_data, "stand_stats.rds"))
   }
+  
   # Get & predict new data
-  games_upcoming <- get_upcoming_fixtures()
+  if (predit_future_games) {
+    games_upcoming <- get_upcoming_fixtures()
+  } else {
+    games_upcoming <- games_train %>% tail() %>% select(-result) %>% 
+      mutate(home_team = letters[1:6], away_team = letters[7:12])
+  }
+  
   # Predict with each learner
   base_learners <- readRDS(file.path(path_models, "base_learners.rds"))
   base_preds <- lapply(seq(base_learners), function(model_ind) {
@@ -57,17 +72,25 @@ main <- function() {
       select(A, D, H) %>% 
       mutate(model = names(base_learners[model_ind]))
   }) %>% bind_rows()
+  
   # Predict with deep ensemble& save
-  ensemble_preds <- keras_ensemble_predict(games_upcoming, base_preds, 
-                                           stand_stats)
+  stand_stats <- readRDS(file.path(path_data, "stand_stats.rds"))
+  ensemble_preds <- keras_ensemble_predict(games_upcoming, base_preds, stand_stats)
   write_fst(ensemble_preds, path_output)
+  
+  # Visualise predictions
+  preds_plot <- plot_predictions(ensemble_preds)
+  ggsave(file.path(path_results, paste0("plot_", timestamp, ".png")), plot = preds_plot)
 }
 
-
+# Run main modelling framework if script is called from command line
+if (!interactive()) {
+  main()
+}
 
 # TODO
 # 1. Functional test of the entire framework
-# 2. RMarkdown script on top to visualize predictions
+# 2. Add error messages (e.g. if no upcoming games available)
 # 3. Choose caret models to run
 # 4. Train ensemble with a validation set in ensemble_models.R
 # 5. Add regularization, dropout, experiment with layers in build_keras_model.R
