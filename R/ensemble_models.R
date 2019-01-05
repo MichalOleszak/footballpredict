@@ -26,4 +26,10 @@ ensemble_models <- function(models_fitted, models_trained, games_train) {
   
   # Serialize and save model
   save_model_hdf5(keras_ensemble_model, file.path(path_models, "keras_ensemble_model.h5"))
+  
+  # Return standarisation statistics
+  stand_stats <- list("X_means" = X_means,
+                      "X_stds" = X_stds)
+  
+  return(stand_stats)
 }

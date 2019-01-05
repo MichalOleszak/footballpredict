@@ -1,6 +1,3 @@
-# Progress bar settings
-pboptions(type = "txt", style = 3, char = "~", txt.width = NA)
-
 # Seasons of training data
 historic_seasons <- c("0203", "0304", "0405", "0506", "0607", "0708", 
                       "0809", "0910", "1011", "1112", "1213", "1314", 
@@ -27,3 +24,6 @@ keras_num_epochs <- 5
 path_models <- "models"
 path_data <- "data"
 path_results <- "predictions"
+
+# Progress bar settings
+pboptions(type = "txt", style = 3, char = "~", txt.width = NA)
