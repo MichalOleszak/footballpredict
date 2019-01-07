@@ -19,7 +19,7 @@ for (file in list.files("R")) {
 }
 
 # Settings --------------------------------------------------------------------
-predit_future_games <- TRUE
+predict_future_games <- TRUE
 scrape_new_data <- FALSE
 train_new_models <- FALSE
 
@@ -54,10 +54,13 @@ main <- function() {
     models_fitted <- fit_models(base_learners)
     stand_stats <- ensemble_models(models_fitted, base_learners, games_train)
     saveRDS(stand_stats, file.path(path_data, "stand_stats.rds"))
+    # Fit Poisson model
+    poisson_model <- fit_poisson_model()
+    saveRDS(poisson_model, file.path(path_models, "poisson_model.rds"))
   }
   
   # Get & predict new data
-  if (predit_future_games) {
+  if (predict_future_games) {
     games_upcoming <- get_upcoming_fixtures()
   } else {
     games_upcoming <- games_train %>% tail() %>% select(-result) %>% 
@@ -78,8 +81,12 @@ main <- function() {
   ensemble_preds <- keras_ensemble_predict(games_upcoming, base_preds, stand_stats)
   write_fst(ensemble_preds, path_output)
   
+  # Predict with Poisson model
+  poisson_model <- readRDS(file.path(path_models, "poisson_model.rds"))
+  poisson_preds <- predict_poisson(games_upcoming, poisson_model)
+  
   # Visualise predictions
-  preds_plot <- plot_predictions(ensemble_preds)
+  preds_plot <- plot_predictions(poisson_preds %>% select(-H_goals, -A_goals))
   ggsave(file.path(path_results, paste0("plot_", timestamp, ".png")), plot = preds_plot)
 }
 

@@ -19,8 +19,8 @@ get_and_prep_data <- function(seasons) {
   }) %>% bind_rows()
 
   # Clean final output data
-  games_train <- historic_games %>% 
-    select(date, home_team, away_team, result, B365H, B365D, B365A) %>% 
+  games_train_date_teams <- historic_games %>% 
+    select(date, home_team, away_team, result) %>% 
     left_join(elo_data, by = c("date" = "date", "home_team" = "club")) %>% 
     rename(home_elo = elo) %>% 
     left_join(elo_data, by = c("date" = "date", "away_team" = "club")) %>% 
@@ -31,14 +31,16 @@ get_and_prep_data <- function(seasons) {
     left_join(historic_recent_form %>% 
                 set_names(paste0("away_", colnames(historic_recent_form))), 
               by = c("away_team", "date" = "away_search_date")) %>% 
-    select(-date, -home_team, -away_team, -B365H, -B365D, -B365A) %>% 
     filter(complete.cases(.))
+  games_train <- games_train_date_teams %>% 
+    select(-date, -home_team, -away_team)
   
   # Save to disc
   if (!dir.exists("data")) {
     dir.create("data")
   }
   saveRDS(games_train, file = "data/games_train.rds")
+  saveRDS(games_train_date_teams, file = "data/games_train_date_teams.rds")
   saveRDS(elo_recent, file = "data/elo_recent.rds")
   saveRDS(historic_games, file = "data/historic_games.rds")
   

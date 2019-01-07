@@ -21,5 +21,8 @@ get_upcoming_fixtures <- function() {
                 set_names(paste0("away_", colnames(recent_form))), 
               by = c("away_team"))
   out <- out[complete.cases(out), ]
+  if (nrow(out) == 0) {
+    stop("No upcoming fixtures available!")
+  }
   return(out)
 }

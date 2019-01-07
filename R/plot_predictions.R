@@ -17,7 +17,9 @@ plot_predictions <- function(preds) {
                 fill = "white", size = 5) +
       xlab("") +
       ylab("") +
-      theme_minimal()
+      ggtitle("Result probabilities") +
+      theme_minimal() +
+      theme(plot.title = element_text(hjust = 0.5, face = "bold"))
   
   return(preds_plot)
 }  

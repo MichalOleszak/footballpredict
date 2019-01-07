@@ -11,7 +11,7 @@ keras_ensemble_predict <- function(games_upcoming, base_preds, stand_stats) {
       set_names(x, c(paste0("A_", x$model[1]), paste0("H_", x$model[1]), "model")) %>% 
         select(-model)
     }) %>% 
-    bind_cols(games_upcoming %>% select(-home_team, -away_team))
+    bind_cols(games_upcoming %>% select(-home_team, -away_team, -date))
   # Prepare new data for ensemble's predicting function
   X <- ensemble_input %>% 
     as.matrix() %>% 
