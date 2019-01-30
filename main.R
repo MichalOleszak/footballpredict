@@ -19,7 +19,7 @@ for (file in list.files("R")) {
 }
 
 # Settings --------------------------------------------------------------------
-predict_future_games <- TRUE
+predict_future_games <- FALSE
 scrape_new_data <- FALSE
 train_new_models <- FALSE
 
@@ -55,10 +55,10 @@ main <- function() {
     stand_stats <- ensemble_models(models_fitted, base_learners, games_train)
     saveRDS(stand_stats, file.path(path_data, "stand_stats.rds"))
     # Fit Poisson model
-    poisson_model <- fit_poisson_model()
-    saveRDS(poisson_model, file.path(path_models, "poisson_model.rds"))
+    #poisson_model <- fit_poisson_model()
+    #saveRDS(poisson_model, file.path(path_models, "poisson_model.rds"))
   }
-  
+ 
   # Get & predict new data
   if (predict_future_games) {
     games_upcoming <- get_upcoming_fixtures()
@@ -82,11 +82,12 @@ main <- function() {
   write_fst(ensemble_preds, path_output)
   
   # Predict with Poisson model
-  poisson_model <- readRDS(file.path(path_models, "poisson_model.rds"))
-  poisson_preds <- predict_poisson(games_upcoming, poisson_model)
+  #poisson_model <- readRDS(file.path(path_models, "poisson_model.rds"))
+  #poisson_preds <- predict_poisson(games_upcoming, poisson_model)
   
   # Visualise predictions
-  preds_plot <- plot_predictions(poisson_preds %>% select(-H_goals, -A_goals))
+  #preds_plot <- plot_predictions(poisson_preds %>% select(-H_goals, -A_goals))
+  preds_plot <- plot_predictions(ensemble_preds)
   ggsave(file.path(path_results, paste0("plot_", timestamp, ".png")), plot = preds_plot)
 }
 
@@ -96,9 +97,7 @@ if (!interactive()) {
 }
 
 # TODO
-# 1. Functional test of the entire framework
 # 2. Add error messages (e.g. if no upcoming games available)
-# 3. Choose caret models to run
 # 4. Train ensemble with a validation set in ensemble_models.R
 # 5. Add regularization, dropout, experiment with layers in build_keras_model.R
 # 6. Add early stopping and these kinds of things in build_keras_model.R

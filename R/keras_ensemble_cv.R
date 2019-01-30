@@ -12,7 +12,7 @@ keras_ensemble_cv <- function(models_fitted, games_train) {
   
   X <- ensemble_input %>% select(-result) %>% as.matrix()
   X <- apply(X, 2, function(x) (x - mean(x)) / sd(x))
-  y <- ensemble_input %>% pull(result) %>% factor(levels = C("H", "D", "A")) %>% as.numeric()
+  y <- ensemble_input %>% pull(result) %>% factor(levels = c("H", "D", "A")) %>% as.numeric()
   one_hot_y <- to_categorical(y - 1, num_classes = 3)
   
   # Assess performance of the model as desinged in build_keras_model() with cross-validation

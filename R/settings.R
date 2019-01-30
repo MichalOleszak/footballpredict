@@ -14,11 +14,12 @@ elo_teams <- c("chelsea", "mancity", "manunited", "liverpool", "tottenham",
                "brighton", "fulham", "westbrom", "sheffieldunited")
 
 # Caret models to train
-models_to_train <- c("LogitBoost", "rpart")#, "xgbTree")
+models_to_train <- c("bagFDA", "mlpKerasDecayCost", "regLogistic", "spls", "svmLinear3",
+                     "xgbTree", "xgbLinear", "RFlda", "widekernelpls")
 
 # Keras training settings
-keras_cv_k <- 3
-keras_num_epochs <- 5
+keras_cv_k <- 5
+keras_num_epochs <- 20
 
 # Paths
 path_models <- "models"

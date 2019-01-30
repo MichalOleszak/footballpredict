@@ -16,12 +16,12 @@ ensemble_models <- function(models_fitted, models_trained, games_train) {
   X <- apply(X, 2, function(x) (x - mean(x)) / sd(x))
   y <- ensemble_input %>% pull(result) %>% factor(levels = c("H", "D", "A")) %>% as.numeric()
   one_hot_y <- to_categorical(y - 1, num_classes = 3)
-  # TODO: train with a validation set
+  
   # Train a densely connected neural network using original features and base learner's output
   keras_ensemble_model <- build_keras_model(input_shape = ncol(X))
   keras_ensemble_model %>% fit(X, 
                                one_hot_y,
-                               epochs = 40,
+                               epochs = keras_num_epochs,
                                batch_size = 16)
   
   # Serialize and save model
