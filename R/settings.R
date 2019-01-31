@@ -19,7 +19,7 @@ models_to_train <- c("bagFDA", "mlpKerasDecayCost", "regLogistic", "spls", "svmL
 
 # Keras training settings
 keras_cv_k <- 5
-keras_num_epochs <- 20
+keras_num_epochs <- 15
 
 # Paths
 path_models <- "models"

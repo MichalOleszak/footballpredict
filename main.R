@@ -19,7 +19,7 @@ for (file in list.files("R")) {
 }
 
 # Settings --------------------------------------------------------------------
-predict_future_games <- FALSE
+predict_future_games <- TRUE
 scrape_new_data <- FALSE
 train_new_models <- FALSE
 
