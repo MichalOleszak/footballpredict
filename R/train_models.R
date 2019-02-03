@@ -26,6 +26,9 @@ train_models <- function(games_train, models_to_train) {
   results$metrics <- "Mean_Pos_Pred_Value"
   scales <- list(x = list(relation = "free"), y = list(relation = "free"))
   print(bwplot(results, scales = scales))
+
+  # Save base learners
+  saveRDS(models, file.path(path_models, paste0(prefix, "_base_learners.rds")))
   
   return(models)
 }

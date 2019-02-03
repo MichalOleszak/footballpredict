@@ -15,6 +15,9 @@ keras_ensemble_cv <- function(models_fitted, games_train) {
   y <- ensemble_input %>% pull(result) %>% factor(levels = c("H", "D", "A")) %>% as.numeric()
   one_hot_y <- to_categorical(y - 1, num_classes = 3)
   
+  # Calculate class weights to account for imbalance
+  cw <- get_balancing_class_weights(games_train$result)
+  
   # Assess performance of the model as desinged in build_keras_model() with cross-validation
   indices <- sample(1:nrow(X))
   folds <- cut(indices, breaks = keras_cv_k, labels = FALSE)
@@ -35,7 +38,8 @@ keras_ensemble_cv <- function(models_fitted, games_train) {
                              partial_train_targets,
                              validation_data = list(val_data, val_targets),
                              epochs = keras_num_epochs,
-                             batch_size = 1)
+                             batch_size = 1,
+                             class_weight = cw)
     # Evaluate the model on validation data
     acc_history <- history$metrics$val_acc
     all_acc_histories <- rbind(all_acc_histories, acc_history)

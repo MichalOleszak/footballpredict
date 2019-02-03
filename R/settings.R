@@ -14,8 +14,8 @@ elo_teams <- c("chelsea", "mancity", "manunited", "liverpool", "tottenham",
                "brighton", "fulham", "westbrom", "sheffieldunited")
 
 # Caret models to train
-models_to_train <- c("bagFDA", "mlpKerasDecayCost", "regLogistic", "spls", "svmLinear3",
-                     "xgbTree", "xgbLinear", "RFlda", "widekernelpls")
+models_to_train <- c("bagFDA", "mlpKerasDecayCost", "regLogistic", "spls",
+                     "xgbTree", "xgbLinear", "widekernelpls")
 
 # Keras training settings
 keras_cv_k <- 5

@@ -17,19 +17,27 @@ ensemble_models <- function(models_fitted, models_trained, games_train) {
   y <- ensemble_input %>% pull(result) %>% factor(levels = c("H", "D", "A")) %>% as.numeric()
   one_hot_y <- to_categorical(y - 1, num_classes = 3)
   
+  # Calculate class weights to account for imbalance
+  cw <- get_balancing_class_weights(games_train$result)
+  
   # Train a densely connected neural network using original features and base learner's output
   keras_ensemble_model <- build_keras_model(input_shape = ncol(X))
   keras_ensemble_model %>% fit(X, 
                                one_hot_y,
                                epochs = keras_num_epochs,
-                               batch_size = 16)
+                               batch_size = 16,
+                               class_weight = cw)
   
   # Serialize and save model
-  save_model_hdf5(keras_ensemble_model, file.path(path_models, "keras_ensemble_model.h5"))
+  save_model_hdf5(keras_ensemble_model, 
+                  file.path(path_models, paste0(prefix, "_keras_ensemble_model.h5")))
   
-  # Return standarisation statistics
-  stand_stats <- list("X_means" = X_means,
-                      "X_stds" = X_stds)
+  # Save standarisation statistics
+  stand_stats <- list("X_means" = X_means, "X_stds" = X_stds)
+  saveRDS(stand_stats, file.path(path_data, paste0(prefix, "_stand_stats.rds")))
   
-  return(stand_stats)
+  out <- list("stand_stats" = stand_stats,
+              "keras_ensemble_model" = keras_ensemble_model)
+  
+  return(out)
 }
