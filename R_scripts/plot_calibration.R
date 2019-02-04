@@ -1,7 +1,10 @@
 library(gridExtra)
-library(viridis)
 
-# Needs: ensemble_preds, games_train (as save on drive), obs_test
+# Needs ensemble_preds to be in the environment!
+
+games_train <- readRDS(file.path(path_data, "games_train.rds"))
+obs_train <- 1:round(nrow(games_train) * 0.8)
+obs_test <- (tail(obs_train, 1) + 1):nrow(games_train)
 
 dat <- ensemble_preds %>% 
   bind_cols(games_train[obs_test, "result"]) %>% 

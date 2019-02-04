@@ -111,3 +111,11 @@ main <- function() {
 if (!interactive()) {
   main()
 }
+
+
+# TODO
+# - optimize ppv in keras
+# - remove initial games of each team from data (used to get recent form)
+# - add more data (other leagues)
+# - add Bayesian multinomial logit
+# - add some Poisson modelling based on number of goals scored and lost
