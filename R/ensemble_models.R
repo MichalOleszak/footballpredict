@@ -34,7 +34,7 @@ ensemble_models <- function(models_fitted, models_trained, games_train) {
   
   # Save standarisation statistics
   stand_stats <- list("X_means" = X_means, "X_stds" = X_stds)
-  saveRDS(stand_stats, file.path(path_data, paste0(prefix, "_stand_stats.rds")))
+  saveRDS(stand_stats, file.path(path_models, paste0(prefix, "_stand_stats.rds")))
   
   out <- list("stand_stats" = stand_stats,
               "keras_ensemble_model" = keras_ensemble_model)
