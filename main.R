@@ -1,32 +1,11 @@
-# Packages & sourcing ---------------------------------------------------------
-library(dplyr)
-library(caret)
-library(caretEnsemble)
-library(RCurl)
-library(tidyr)
-library(lubridate)
-library(stringr)
-library(pbapply)
-library(readr)
-library(keras)
-library(purrr)
-library(fst)
-library(ggplot2)
-library(scales)
-library(viridis)
+# Source functions & config
 for (file in list.files("R")) {
   source(file.path("R", file))
 }
+source("config.R")
+source("requirements.R")
 
-# Settings --------------------------------------------------------------------
-predict_future_games <- FALSE
-scrape_new_data <- FALSE
-train_new_models <- TRUE
-
-prefix <- "calibration_test"
-plot_predictions <- FALSE
-
-# Modelling framework ---------------------------------------------------------
+# Modelling framework
 main <- function() {
   
   # Create paths and set output file name
@@ -70,9 +49,6 @@ main <- function() {
     keras_ensemble <- ensemble_models(models_fitted, base_learners, games_train)
     keras_ensemble_model <- keras_ensemble[["keras_ensemble_model"]]
     stand_stats <- keras_ensemble[["stand_stats"]]
-    # Fit Poisson model
-    #poisson_model <- fit_poisson_model()
-    #saveRDS(poisson_model, file.path(path_models, "poisson_model.rds"))
   } else {
     base_learners <- readRDS(file.path(path_models, paste0(prefix, "_base_learners.rds")))
     keras_ensemble_model <- load_model_hdf5(
@@ -94,15 +70,16 @@ main <- function() {
                                            base_preds, stand_stats)
   write_fst(ensemble_preds, path_output)
   
-  # Predict with Poisson model
-  #poisson_model <- readRDS(file.path(path_models, "poisson_model.rds"))
-  #poisson_preds <- predict_poisson(games_upcoming, poisson_model)
-  
   # Visualise predictions
-  if (plot_predictions) {
+  if (do_plot_preds) {
     #preds_plot <- plot_predictions(poisson_preds %>% select(-H_goals, -A_goals))
     preds_plot <- plot_predictions(ensemble_preds)
     ggsave(file.path(path_results, paste0(prefix, "plot_", timestamp, ".png")), 
+           plot = preds_plot)
+  }
+  if (do_plot_calibration) {
+    plot_calibration(ensemble_preds)
+    ggsave(file.path(path_results, paste0(prefix, "calibration_", timestamp, ".png")), 
            plot = preds_plot)
   }
 }
@@ -111,11 +88,3 @@ main <- function() {
 if (!interactive()) {
   main()
 }
-
-
-# TODO
-# - optimize ppv in keras
-# - remove initial games of each team from data (used to get recent form)
-# - add more data (other leagues)
-# - add Bayesian multinomial logit
-# - add some Poisson modelling based on number of goals scored and lost

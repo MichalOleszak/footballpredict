@@ -11,6 +11,7 @@ build_keras_model <- function(input_shape) {
     optimizer = "rmsprop",
     loss = "categorical_crossentropy",
     metrics = "accuracy"
+    #metrics = metric_ppv
   )
   
   return(model)
