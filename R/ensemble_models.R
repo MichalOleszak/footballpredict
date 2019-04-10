@@ -8,7 +8,8 @@ ensemble_models <- function(models_fitted, models_trained, games_train) {
       set_names(x, c(paste0("A_", x$model[1]), paste0("H_", x$model[1]), "model")) %>% 
         select(-model)
     }) %>% 
-    bind_cols(games_train)
+    bind_cols(games_train["result"])
+  # bind_cols(games_train)
   
   X <- ensemble_input %>% select(-result) %>% as.matrix()
   X_means <- apply(X, 2, mean)

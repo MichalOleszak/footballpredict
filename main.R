@@ -1,9 +1,9 @@
 # Source functions & config
+source("requirements.R")
+source("config.R")
 for (file in list.files("R")) {
   source(file.path("R", file))
 }
-source("config.R")
-source("requirements.R")
 
 # Modelling framework
 main <- function() {
@@ -65,9 +65,14 @@ main <- function() {
       mutate(model = names(base_learners[model_ind]))
   }) %>% bind_rows()
   
-  # Predict with deep ensemble& save
+  # Predict with deep ensemble
   ensemble_preds <- keras_ensemble_predict(games_upcoming, keras_ensemble_model, 
                                            base_preds, stand_stats)
+  
+  # Calibrate predictions
+  # TODO
+  
+  # Save final predictoins
   write_fst(ensemble_preds, path_output)
   
   # Visualise predictions
@@ -78,9 +83,9 @@ main <- function() {
            plot = preds_plot)
   }
   if (do_plot_calibration) {
-    plot_calibration(ensemble_preds)
+    calibration_plot <- plot_calibration(ensemble_preds)
     ggsave(file.path(path_results, paste0(prefix, "calibration_", timestamp, ".png")), 
-           plot = preds_plot)
+           plot = calibration_plot)
   }
 }
 
