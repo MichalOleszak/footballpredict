@@ -70,22 +70,34 @@ main <- function() {
                                            base_preds, stand_stats)
   
   # Calibrate predictions
-  # TODO
+  if (train_new_models) {
+    calibration_model <- build_calibration_model(ensemble_preds)
+  } else {
+    calibration_model <- readRDS(paste0("models/", prefix, "_calibration.rds"))
+  }
+  calibrated_preds <- calibrate_predictions(ensemble_preds, calibration_model)
+  
+  # Sanity check for improbably preds
+  final_preds <- sanity_check_predictions(calibrated_preds, games_upcoming)
   
   # Save final predictoins
-  write_fst(ensemble_preds, path_output)
+  write_fst(final_preds, path_output)
   
   # Visualise predictions
   if (do_plot_preds) {
-    #preds_plot <- plot_predictions(poisson_preds %>% select(-H_goals, -A_goals))
-    preds_plot <- plot_predictions(ensemble_preds)
-    ggsave(file.path(path_results, paste0(prefix, "plot_", timestamp, ".png")), 
+    preds_plot <- plot_predictions(final_preds)
+    ggsave(file.path(path_img, paste0(prefix, "plot_", timestamp, ".png")), 
            plot = preds_plot)
   }
   if (do_plot_calibration) {
-    calibration_plot <- plot_calibration(ensemble_preds)
-    ggsave(file.path(path_results, paste0(prefix, "calibration_", timestamp, ".png")), 
+    calibration_plot <- plot_calibration(calibrated_preds)
+    ggsave(file.path(path_img, paste0(prefix, "calibration_", timestamp, ".png")), 
            plot = calibration_plot)
+  }
+  
+  # Return final predictions if set in config
+  if (return_output) {
+    return(final_preds)
   }
 }
 

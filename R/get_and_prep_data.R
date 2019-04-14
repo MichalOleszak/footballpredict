@@ -33,7 +33,8 @@ get_and_prep_data <- function(seasons) {
               by = c("away_team", "date" = "away_search_date")) %>% 
     filter(complete.cases(.))
   games_train <- games_train_date_teams %>% 
-    select(-date, -home_team, -away_team)
+    select(-date, -home_team, -away_team) %>% 
+    filter(result != "")
   
   # Save to disc
   if (!dir.exists("data")) {

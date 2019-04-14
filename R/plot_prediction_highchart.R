@@ -10,7 +10,7 @@ plot_predictions_highchart <- function(preds) {
   hchart <- highchart() %>% 
     hc_chart(type = "bar") %>%
     hc_xAxis(categories = preds_plot$label) %>% 
-    hc_title(text = "Upcoming Premier League Fixtures' Winning Odds") %>%
+    hc_title(text = "Upcoming Fixtures' Winning Odds") %>%
     hc_tooltip(pointFormat = "<span style=\"color:{series.color}\">{series.name}</span>:
                <b>{point.percentage:.1f}%</b> <br/>",
                shared = TRUE) %>% 

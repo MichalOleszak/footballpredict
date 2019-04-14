@@ -25,6 +25,7 @@ keras_num_epochs <- 15
 path_models <- "models"
 path_data <- "data"
 path_results <- "predictions"
+path_img <- "img"
 
 # Progress bar settings
 pboptions(type = "txt", style = 3, char = "~", txt.width = NA)

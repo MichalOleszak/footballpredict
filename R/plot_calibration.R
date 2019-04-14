@@ -1,5 +1,7 @@
-plot_calibration <- function(ensemble_preds) {
-  games_train <- readRDS(file.path("data", "games_train.rds"))
+plot_calibration <- function(ensemble_preds, games_train = NULL) {
+  if (is.null(games_train)) {
+    games_train <- readRDS(file.path(path_data, "games_train.rds"))
+  }
   obs_train <- 1:round(nrow(games_train) * 0.8)
   obs_test <- (tail(obs_train, 1) + 1):nrow(games_train)
   
@@ -12,7 +14,7 @@ plot_calibration <- function(ensemble_preds) {
   
   res <- tibble()
   for (predicted_class in c("H", "A", "D")) {
-    for (predicted_prob in seq(0.5, 0.95, by = 0.05)) {
+    for (predicted_prob in seq(0, 0.95, by = 0.05)) {
       temp <- dat %>% 
         filter(pred == predicted_class) %>% 
         filter(prob_pred >= predicted_prob & prob_pred < predicted_prob + 0.05)
@@ -36,7 +38,7 @@ plot_calibration <- function(ensemble_preds) {
   
   grid.arrange(ggplot(res, aes(prob, ppv, colour = Result)) + 
                  ylim(c(0, 1)) +
-                 xlim(c(0.5, 0.95)) +
+                 xlim(c(0, 0.95)) +
                  geom_line(size = 1, alpha = 0.6) +
                  geom_point(size = 3) +
                  geom_abline() +
@@ -44,13 +46,13 @@ plot_calibration <- function(ensemble_preds) {
                  ylab("Positive Predictive Value") +
                  xlab("") +
                  theme_minimal() +
-                 scale_colour_manual(values = c("#2f7ed8", "#8bbc21")),
+                 scale_colour_manual(values = c("#8bbc21", "#2f7ed8")),
                ggplot(res, aes(prob, n_obs, fill = Result)) +
                  geom_bar(stat = "identity", position = "dodge", alpha = 0.6) +
                  ylab("% observations") +
                  xlab("Predicted result probability (intervals of length 0.05)") +
                  theme_minimal() +
-                 scale_fill_manual(values = c("#2f7ed8", "#8bbc21")),
+                 scale_fill_manual(values = c("#8bbc21", "#2f7ed8")),
                layout_matrix = matrix(c(1,1,2), ncol = 1))
 }
 

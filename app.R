@@ -1,11 +1,8 @@
 library(shiny)
 library(shinythemes)
-library(fst)
-library(dplyr)
-library(tidyr)
 library(highcharter)
-source('R/plot_prediction_highchart.R')
-source('R/plot_calibration.R')
+source('main.R')
+source('app_config.R')
 
 shinyApp(
   ui = tagList(
@@ -15,7 +12,7 @@ shinyApp(
       tabPanel("Home",
                "App under construction"
       ),
-      tabPanel("Premier League Predictions",
+      tabPanel("England",
                mainPanel(
                  highchartOutput("preds_plot", width = "600px", height = "650px")
                )
@@ -28,13 +25,16 @@ shinyApp(
     )
   ),
   server = function(input, output) {
+    preds <- main()
     output$preds_plot <- renderHighchart({
-      preds <- read_fst("predictions/run_preds_2019-04-09_18-50.fst")
       plot_predictions_highchart(preds)
     })
     output$calibration_plot <- renderPlot({
-      preds <- read_fst("predictions/testing_preds_2019-04-10_20-45.fst")
-      plot_calibration(preds)
+      calibration_preds <- read_fst(paste0("app_files/", prefix, 
+                                           "_calibration_preds.fst"))
+      calibration_games_train <- read_rds(paste0("app_files/", prefix, 
+                                                 "_calibration_games_train.rds"))
+      plot_calibration(calibration_preds, calibration_games_train)
     })
   }
 )

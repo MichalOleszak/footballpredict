@@ -5,6 +5,6 @@ account: michaloleszak
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 850970
-bundleId: 2001152
+bundleId: 2001364
 url: https://michaloleszak.shinyapps.io/footballpredict/
-when: 1554920245.65117
+when: 1554927735.53541
