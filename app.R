@@ -10,7 +10,7 @@ shinyApp(
       theme = shinytheme("cerulean"),
       "footballpredict AI",
       tabPanel("Home",
-               "App under construction"
+               includeMarkdown("app_files/home.md")
       ),
       tabPanel("England",
                mainPanel(
