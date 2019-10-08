@@ -18,6 +18,7 @@ train_models <- function(games_train, models_to_train) {
                       metric = "Mean_Pos_Pred_Value",
                       preProcess = c("center", "scale"),
                       tuneLength = 75,
+                      probMethod = "Bayes",
                       methodList = models_to_train,
                       continue_on_fail = TRUE)
 

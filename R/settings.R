@@ -1,7 +1,7 @@
 # Seasons of training data
 historic_seasons <- c("0203", "0304", "0405", "0506", "0607", "0708", 
                       "0809", "0910", "1011", "1112", "1213", "1314", 
-                      "1415", "1516", "1617", "1718", "1819")
+                      "1415", "1516", "1617", "1718", "1819", "1920")
 
 # Team names as in ELO data
 elo_teams <- c("chelsea", "mancity", "manunited", "liverpool", "tottenham", 
@@ -14,8 +14,9 @@ elo_teams <- c("chelsea", "mancity", "manunited", "liverpool", "tottenham",
                "brighton", "fulham", "westbrom", "sheffieldunited")
 
 # Caret models to train
-models_to_train <- c("bagFDA", "mlpKerasDecayCost", "regLogistic", "spls",
-                     "xgbTree", "xgbLinear", "widekernelpls")
+#models_to_train <- c("bagFDA", "mlpKerasDecayCost", "regLogistic", "spls",
+#                     "xgbTree", "xgbLinear", "widekernelpls")
+models_to_train <- c("regLogistic", "widekernelpls")
 
 # Keras training settings
 keras_cv_k <- 5

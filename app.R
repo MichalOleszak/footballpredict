@@ -1,8 +1,10 @@
 library(shiny)
 library(shinythemes)
 library(highcharter)
-source('main.R')
-source('app_config.R')
+library(markdown)
+source("app_main.R")
+source(file.path("R", "plot_prediction_highchart.R"))
+source(file.path("R", "plot_calibration.R"))
 
 shinyApp(
   ui = tagList(
@@ -25,7 +27,7 @@ shinyApp(
     )
   ),
   server = function(input, output) {
-    preds <- main()
+    preds <- app_main()
     output$preds_plot <- renderHighchart({
       plot_predictions_highchart(preds)
     })

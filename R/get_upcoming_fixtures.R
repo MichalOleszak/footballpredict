@@ -1,6 +1,6 @@
 get_upcoming_fixtures <- function() {
-  historic_games <- readRDS(file.path(path_data, "historic_games.rds"))
-  elo_recent <- readRDS(file.path(path_data, "elo_recent.rds")) %>% 
+  historic_games <- readRDS(file.path("data", "historic_games.rds"))
+  elo_recent <- readRDS(file.path("data", "elo_recent.rds")) %>% 
     select(-date)
   recent_form <- get_recent_form(recent_games = historic_games)
   download <- "api.clubelo.com/Fixtures" %>% getURL()
@@ -22,7 +22,7 @@ get_upcoming_fixtures <- function() {
               by = c("away_team"))
   out <- out[complete.cases(out), ]
   if (nrow(out) == 0) {
-    stop("No upcoming fixtures available!")
+    warning("No upcoming fixtures available!")
   }
   return(out)
 }

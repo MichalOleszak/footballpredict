@@ -44,6 +44,4 @@ get_and_prep_data <- function(seasons) {
   saveRDS(games_train_date_teams, file = file.path(path_data, "games_train_date_teams.rds"))
   saveRDS(elo_recent, file = file.path(path_data, "elo_recent.rds"))
   saveRDS(historic_games, file = file.path(path_data, "historic_games.rds"))
-  
-  return(games_train)
 }
